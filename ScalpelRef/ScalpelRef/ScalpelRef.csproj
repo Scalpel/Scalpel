@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="ExtractMethodOnParent.cs" />
     <Compile Include="ExtractParameter.cs" />
+    <Compile Include="ExtractToInterface.cs" />
     <Compile Include="MergeOptionalOverloads.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
