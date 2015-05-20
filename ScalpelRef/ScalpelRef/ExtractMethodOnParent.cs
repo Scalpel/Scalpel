@@ -18,9 +18,9 @@ namespace ScalpelRef
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(ExtractMethodOnParent)), Shared]
     internal class ExtractMethodOnParent : CodeRefactoringProvider
     {
-        public sealed override Task ComputeRefactoringsAsync(CodeRefactoringContext context)
+        public sealed async override Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
-            return null;
+            return;
         }
     }
 }

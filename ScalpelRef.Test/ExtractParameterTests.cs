@@ -63,8 +63,8 @@ namespace ClassLibrary1
             var changeDocument = GetModifiedText(action).Result;
 
             Assert.AreEqual(file
-                .Replace("string Method1()", "string Method1(string a = \"out\")")
-                .Replace("return \"out\"", "return a")
+                .Replace("string Method1()", "string Method1(string MyParameter = \"out\")")
+                .Replace("return \"out\"", "return MyParameter")
                 , changeDocument);
         }
 

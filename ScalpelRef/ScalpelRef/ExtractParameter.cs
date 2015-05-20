@@ -52,17 +52,90 @@ namespace ScalpelRef
         {
             // Get the symbol representing the type to be renamed.
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var methodSymbol = semanticModel.GetDeclaredSymbol(methodDecl, cancellationToken);
 
-            
-
-            // Produce a new solution that has all references to that type renamed, including the declaration.
-            var originalSolution = document.Project.Solution;
-            var optionSet = originalSolution.Workspace.Options;
-            var newSolution = originalSolution;// await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
+            var rewriter = new ExtractParameterRewriter();
 
             // Return the new solution with the now-uppercase type name.
-            return newSolution;
+            return rewriter.Visit(document.Project.Solution, document, typeDecl, methodDecl, semanticModel);
+        }
+
+        private class ExtractParameterRewriter : CSharpSyntaxRewriter
+        {
+            private MethodDeclarationSyntax methodDecl;
+            private LiteralExpressionSyntax typeDecl;
+            private SemanticModel semanticModel;
+            private TypeInfo typeSymbol;
+
+            public Solution Visit(Solution solution, Document document, LiteralExpressionSyntax typeDecl, MethodDeclarationSyntax methodDecl, SemanticModel semanticModel)
+            {
+                this.semanticModel = semanticModel;
+                this.typeDecl = typeDecl;
+                this.methodDecl = methodDecl;
+
+                this.typeSymbol = semanticModel.GetTypeInfo(typeDecl);
+
+                var root = this.Visit(document.GetSyntaxRootAsync().Result);
+                return solution.WithDocumentSyntaxRoot(document.Id, root);
+            }
+
+            public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+            {
+                if (node != methodDecl)
+                    return base.VisitMethodDeclaration(node);
+                
+                var parameters = methodDecl.ParameterList.Parameters.Add
+                    (SyntaxFactory.Parameter(SyntaxFactory.Identifier("MyParameter").WithAdditionalAnnotations(RenameAnnotation.Create()))
+                        .WithType(SyntaxFactory.ParseTypeName(GetPredefinedTypeOrType(typeSymbol.ConvertedType.Name)))
+                        .WithDefault(SyntaxFactory.EqualsValueClause(typeDecl)));
+                return node.WithParameterList(node.ParameterList.WithParameters(parameters))
+                    .WithBody((BlockSyntax)Visit(node.Body));
+            }
+
+            public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
+            {
+                if (node != typeDecl)
+                    return base.VisitLiteralExpression(node);
+
+                return SyntaxFactory.IdentifierName("MyParameter");
+            }
+
+            private string GetPredefinedTypeOrType(string v)
+            {
+                switch (v)
+                {
+                    case "Boolean":
+                        return "bool";
+                    case "Byte":
+                        return "byte";
+                    case "SByte":
+                        return "sbyte";
+                    case "Char":
+                        return "char";
+                    case "Decimal":
+                        return "decimal";
+                    case "Double":
+                        return "double";
+                    case "Single":
+                        return "float";
+                    case "Int32":
+                        return "int";
+                    case "Int64":
+                        return "long";
+                    case "UInt32":
+                        return "uint";
+                    case "UInt64":
+                        return "ulong";
+                    case "Int16":
+                        return "short";
+                    case "UInt16":
+                        return "ushort";
+                    case "String":
+                        return "string";
+                    default:
+                        return v;
+                }
+            }
+
         }
     }
 }

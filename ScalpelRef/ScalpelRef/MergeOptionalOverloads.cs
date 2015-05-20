@@ -20,9 +20,9 @@ namespace ScalpelRef
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(MergeOptionalOverloads)), Shared]
     internal class MergeOptionalOverloads : CodeRefactoringProvider
     {
-        public sealed override Task ComputeRefactoringsAsync(CodeRefactoringContext context)
+        public sealed async override Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
-            throw new NotImplementedException();
+            return;
         }
     }
 }
