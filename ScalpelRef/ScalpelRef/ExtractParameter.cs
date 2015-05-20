@@ -19,61 +19,42 @@ namespace ScalpelRef
     {
         public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each refactoring to offer
-
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-
-            // Find the node at the selection.
             var node = root.FindNode(context.Span);
 
-            // Only offer a refactoring if the selected node is a type declaration node.
-            var typeDecl = node.DescendantNodesAndSelf().OfType<LiteralExpressionSyntax>()?
-                .FirstOrDefault(l => ContainsBorderInclusive(l.Span, context.Span.Start));
-            if (typeDecl == null)
+            var literal = node.DescendantNodesAndSelf().OfType<LiteralExpressionSyntax>()?
+                .FirstOrDefault(l => l.Span.ContainsInclusive(context.Span.Start));
+            if (literal == null)
                 return;
 
-            var containingMethod = GetContainingMethod(typeDecl);
+            var containingMethod = GetContainingMethod(literal);
             if (containingMethod == null)
                 return;
 
-            if (!CanBeExtracted(typeDecl))
+            if (!CanBeExtracted(literal))
                 return;
 
-            // For any type declaration node, create a code action to reverse the identifier text.
-            var action = CodeAction.Create("Extract Parameter", c => ExtractParameter(context.Document, typeDecl, containingMethod, c));
-
-            // Register this code action.
+            var action = CodeAction.Create("Extract Parameter", c => ExtractParameter(context.Document, literal, containingMethod, c));
             context.RegisterRefactoring(action);
         }
 
-        private bool CanBeExtracted(LiteralExpressionSyntax typeDecl)
+        private bool CanBeExtracted(LiteralExpressionSyntax literal)
         {
-            return (!typeDecl.AncestorsAndSelf().OfType<LocalDeclarationStatementSyntax>()?.FirstOrDefault()?.IsConst ?? true)
-                && (!typeDecl.AncestorsAndSelf().OfType<ParameterSyntax>()?.Any() ?? true);
+            return (!literal.AncestorsAndSelf().OfType<LocalDeclarationStatementSyntax>()?.FirstOrDefault()?.IsConst ?? true)
+                && (!literal.AncestorsAndSelf().OfType<ParameterSyntax>()?.Any() ?? true);
         }
 
-
-        //TODO: make extension method on TextSpan
-        private static bool ContainsBorderInclusive(TextSpan span, int position)
+        private MethodDeclarationSyntax GetContainingMethod(SyntaxNode literal)
         {
-            return span.Contains(position) || span.Contains(position - 1);
+            return literal.FirstAncestorOrSelf<MethodDeclarationSyntax>(t => t is MethodDeclarationSyntax);
         }
 
-        private MethodDeclarationSyntax GetContainingMethod(SyntaxNode typeDecl)
+        private async Task<Solution> ExtractParameter(Document document, LiteralExpressionSyntax literal, MethodDeclarationSyntax methodDecl, CancellationToken cancellationToken)
         {
-            return typeDecl.FirstAncestorOrSelf<MethodDeclarationSyntax>(t => t is MethodDeclarationSyntax);
-        }
-
-        //if override or interface implementation, then make optional defaulting to current
-        private async Task<Solution> ExtractParameter(Document document, LiteralExpressionSyntax typeDecl, MethodDeclarationSyntax methodDecl, CancellationToken cancellationToken)
-        {
-            // Get the symbol representing the type to be renamed.
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
 
             var rewriter = new ExtractParameterRewriter();
-
-            // Return the new solution with the now-uppercase type name.
-            return rewriter.Visit(document.Project.Solution, document, typeDecl, methodDecl, semanticModel);
+            return rewriter.Visit(document.Project.Solution, document, literal, methodDecl, semanticModel);
         }
 
         private class ExtractParameterRewriter : CSharpSyntaxRewriter
@@ -82,6 +63,8 @@ namespace ScalpelRef
             private LiteralExpressionSyntax typeDecl;
             private SemanticModel semanticModel;
             private TypeInfo typeSymbol;
+
+            private string ParameterName = "MyParameter";
 
             public Solution Visit(Solution solution, Document document, LiteralExpressionSyntax typeDecl, MethodDeclarationSyntax methodDecl, SemanticModel semanticModel)
             {
@@ -101,8 +84,8 @@ namespace ScalpelRef
                     return base.VisitMethodDeclaration(node);
                 
                 var parameters = methodDecl.ParameterList.Parameters.Add
-                    (SyntaxFactory.Parameter(SyntaxFactory.Identifier("MyParameter").WithAdditionalAnnotations(RenameAnnotation.Create()))
-                        .WithType(SyntaxFactory.ParseTypeName(GetPredefinedTypeOrType(typeSymbol.ConvertedType.Name)))
+                    (SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName).WithAdditionalAnnotations(RenameAnnotation.Create()))
+                        .WithType(ScalpelFactory.PrefefinedTypeOrType(typeSymbol.ConvertedType.Name))
                         .WithDefault(SyntaxFactory.EqualsValueClause(typeDecl)));
                 return node.WithParameterList(node.ParameterList.WithParameters(parameters))
                     .WithBody((BlockSyntax)Visit(node.Body));
@@ -113,46 +96,8 @@ namespace ScalpelRef
                 if (node != typeDecl)
                     return base.VisitLiteralExpression(node);
 
-                return SyntaxFactory.IdentifierName("MyParameter");
+                return SyntaxFactory.IdentifierName(ParameterName);
             }
-
-            private string GetPredefinedTypeOrType(string v)
-            {
-                switch (v)
-                {
-                    case "Boolean":
-                        return "bool";
-                    case "Byte":
-                        return "byte";
-                    case "SByte":
-                        return "sbyte";
-                    case "Char":
-                        return "char";
-                    case "Decimal":
-                        return "decimal";
-                    case "Double":
-                        return "double";
-                    case "Single":
-                        return "float";
-                    case "Int32":
-                        return "int";
-                    case "Int64":
-                        return "long";
-                    case "UInt32":
-                        return "uint";
-                    case "UInt64":
-                        return "ulong";
-                    case "Int16":
-                        return "short";
-                    case "UInt16":
-                        return "ushort";
-                    case "String":
-                        return "string";
-                    default:
-                        return v;
-                }
-            }
-
         }
     }
 }
