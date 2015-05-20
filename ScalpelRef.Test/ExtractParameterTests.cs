@@ -69,6 +69,36 @@ namespace ClassLibrary1
         }
 
         [TestMethod]
+        public void WhenTwoConstants_BorderShouldBeInclusive()
+        {
+            var cts = new CancellationTokenSource();
+            var file = @"
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        private void Method1()
+        {
+            var a = 1 + 2;
+        }
+    }
+}
+";
+            var context = CreateContext(file, file.IndexOf("2"));
+
+            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
+
+            var action = context.CodeActions.First();
+            var changeDocument = GetModifiedText(action).Result;
+
+            Assert.AreEqual(file
+                .Replace("void Method1()", "void Method1(int MyParameter = 2)")
+                .Replace("var a = 1 + 2", "var a = 1 + MyParameter")
+                , changeDocument);
+        }
+
+        [TestMethod]
         public void WhenPrivateVariable_RefactoringShouldNotAddCodeAction()
         {
             var cts = new CancellationTokenSource();

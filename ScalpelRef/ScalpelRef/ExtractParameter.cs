@@ -27,7 +27,8 @@ namespace ScalpelRef
             var node = root.FindNode(context.Span);
 
             // Only offer a refactoring if the selected node is a type declaration node.
-            var typeDecl = node.DescendantNodesAndSelf().OfType<LiteralExpressionSyntax>()?.FirstOrDefault();
+            var typeDecl = node.DescendantNodesAndSelf().OfType<LiteralExpressionSyntax>()?
+                .FirstOrDefault(l => ContainsBorderInclusive(l.Span, context.Span.Start));
             if (typeDecl == null)
                 return;
 
@@ -40,6 +41,12 @@ namespace ScalpelRef
 
             // Register this code action.
             context.RegisterRefactoring(action);
+        }
+
+        //TODO: make extension method on TextSpan
+        private static bool ContainsBorderInclusive(TextSpan span, int position)
+        {
+            return span.Contains(position) || span.Contains(position - 1);
         }
 
         private MethodDeclarationSyntax GetContainingMethod(SyntaxNode typeDecl)
