@@ -36,12 +36,22 @@ namespace ScalpelRef
             if (containingMethod == null)
                 return;
 
+            if (!CanBeExtracted(typeDecl))
+                return;
+
             // For any type declaration node, create a code action to reverse the identifier text.
             var action = CodeAction.Create("Extract Parameter", c => ExtractParameter(context.Document, typeDecl, containingMethod, c));
 
             // Register this code action.
             context.RegisterRefactoring(action);
         }
+
+        private bool CanBeExtracted(LiteralExpressionSyntax typeDecl)
+        {
+            return (!typeDecl.AncestorsAndSelf().OfType<LocalDeclarationStatementSyntax>()?.FirstOrDefault()?.IsConst ?? true)
+                && (!typeDecl.AncestorsAndSelf().OfType<ParameterSyntax>()?.Any() ?? true);
+        }
+
 
         //TODO: make extension method on TextSpan
         private static bool ContainsBorderInclusive(TextSpan span, int position)

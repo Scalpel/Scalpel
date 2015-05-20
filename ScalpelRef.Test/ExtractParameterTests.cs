@@ -122,5 +122,105 @@ namespace ClassLibrary1
 
             Assert.AreEqual(0, context.CodeActions.Count);
         }
+
+        [TestMethod]
+        public void WhenLiteralIsAssignedToConstant_ThenItCannotBeExtracted()
+        {
+            var cts = new CancellationTokenSource();
+            var file = @"
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        private void Method1()
+        {
+            const string a = ""out"";
+        }
+    }
+}
+";
+            var context = CreateContext(file, file.IndexOf("out"));
+
+            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
+
+            Assert.AreEqual(0, context.CodeActions.Count);
+        }
+
+
+        [TestMethod]
+        public void WhenLiteralIsFieldInitializer_ThenItCannotBeExtracted()
+        {
+            var cts = new CancellationTokenSource();
+            var file = @"
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        private string a = ""out"";
+
+        private void Method1()
+        {
+        }
+    }
+}
+";
+            var context = CreateContext(file, file.IndexOf("out"));
+
+            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
+
+            Assert.AreEqual(0, context.CodeActions.Count);
+        }
+
+        [TestMethod]
+        public void WhenLiteralIsPartOfAProperty_ThenItCannotBeExtracted()
+        {
+            var cts = new CancellationTokenSource();
+            var file = @"
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public string OutProperty 
+        {
+            get
+            {
+                return ""out"";
+            }
+        }
+    }
+}
+";
+            var context = CreateContext(file, file.IndexOf("out"));
+
+            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
+
+            Assert.AreEqual(0, context.CodeActions.Count);
+        }
+
+        [TestMethod]
+        public void WhenLiteralIsAlreadyAParameter_ThenItCannotBeExtracted()
+        {
+            var cts = new CancellationTokenSource();
+            var file = @"
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        private void Method1(string a = ""out"")
+        {
+        }
+    }
+}
+";
+            var context = CreateContext(file, file.IndexOf("out"));
+
+            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
+
+            Assert.AreEqual(0, context.CodeActions.Count);
+        }
     }
 }
