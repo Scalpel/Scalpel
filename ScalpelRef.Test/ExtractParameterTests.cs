@@ -32,7 +32,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("out"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             Assert.AreEqual(1, context.CodeActions.Count);
@@ -56,7 +56,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("out"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             var action = context.CodeActions.First();
@@ -86,7 +86,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("2"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             var action = context.CodeActions.First();
@@ -117,7 +117,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("a;") - 1);
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             Assert.AreEqual(0, context.CodeActions.Count);
@@ -141,7 +141,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("out"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             Assert.AreEqual(0, context.CodeActions.Count);
@@ -167,7 +167,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("out"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             Assert.AreEqual(0, context.CodeActions.Count);
@@ -194,7 +194,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("out"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             Assert.AreEqual(0, context.CodeActions.Count);
@@ -217,7 +217,7 @@ namespace ClassLibrary1
 ";
             var context = CreateContext(file, file.IndexOf("out"));
 
-            var refactoringProvider = new ScalpelRefCodeRefactoringProvider();
+            var refactoringProvider = new ExtractParameterProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
             Assert.AreEqual(0, context.CodeActions.Count);

@@ -14,8 +14,8 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace ScalpelRef
 {
-    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(ScalpelRefCodeRefactoringProvider)), Shared]
-    internal class ScalpelRefCodeRefactoringProvider : CodeRefactoringProvider
+    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(ExtractParameterProvider)), Shared]
+    internal class ExtractParameterProvider : CodeRefactoringProvider
     {
         public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {

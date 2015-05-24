@@ -36,6 +36,16 @@ namespace ScalpelRef.Test
             return text.ToString();
         }
 
+        protected async Task<Document> GetModifiedDocument(CodeAction action)
+        {
+            var cts = new CancellationTokenSource();
+            var operation = await action.GetOperationsAsync(cts.Token);
+
+            var changeDocument = operation.OfType<ApplyChangesOperation>().First().ChangedSolution.Projects.First().Documents.First();
+
+            return changeDocument;
+        }
+
         private static Project CreateProject(string[] sources, string language = LanguageNames.CSharp)
         {
             var projectId = ProjectId.CreateNewId(Guid.NewGuid().ToString());

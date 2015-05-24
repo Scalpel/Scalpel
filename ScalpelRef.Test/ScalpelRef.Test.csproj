@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="ExtractParameterTests.cs" />
     <Compile Include="Helpers\RefactoringVerifier.cs" />
+    <Compile Include="InlineLambdaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\VerifiableCodeRefactoringContext.cs" />
   </ItemGroup>
