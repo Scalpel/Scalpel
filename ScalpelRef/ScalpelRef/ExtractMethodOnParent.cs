@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 
-namespace ScalpelRef
+namespace Scalpel
 {   //with and without existing parent
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(ExtractMethodOnParent)), Shared]
     internal class ExtractMethodOnParent : CodeRefactoringProvider

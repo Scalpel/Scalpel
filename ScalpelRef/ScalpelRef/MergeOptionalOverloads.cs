@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 
-namespace ScalpelRef
+namespace Scalpel
 {
     //when the only thing an overload does is introducing an optional parameter, merge them
     //also, the opposite: split methods with optionals into one that calls the other

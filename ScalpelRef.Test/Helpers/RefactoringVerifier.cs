@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScalpelRef.Test
+namespace Scalpel.Test
 {
     public abstract class RefactoringVerifier
     {

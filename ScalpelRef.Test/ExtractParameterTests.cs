@@ -9,7 +9,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Threading;
 
-namespace ScalpelRef.Test
+namespace Scalpel.Test
 {
     [TestClass]
     public class ExtractParameterTests : RefactoringVerifier

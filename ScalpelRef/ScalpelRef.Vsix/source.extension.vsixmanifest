@@ -15,6 +15,6 @@
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
   </Dependencies>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="ScalpelRef" Path="|ScalpelRef|"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Scalpel.Refactorings" Path="|Scalpel.Refactorings|"/>
   </Assets>
 </PackageManifest>

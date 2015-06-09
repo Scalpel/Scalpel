@@ -8,48 +8,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScalpelRef.Test
+namespace Scalpel.Test
 {
     [TestClass]
     public class InlineLambdaTests : RefactoringVerifier
     {
         [TestMethod]
-        public void WhenParameterIsMethod_AddCodeAction()
-        {
-            var cts = new CancellationTokenSource();
-            var file = @"
-namespace ClassLibrary1
-{
-    public class Class1
-    {
-
-        public int StrategyReplace(Func<int, int, int> action)
-        {
-            return action(1, 2);
-        }
-
-        public int Adder(int a, int b)
-        {
-            return a + b;
-        }
-
-        public void Method1()
-        {
-            var a = StrategyReplace(Adder);
-        }
-    }
-}
-";
-            var context = CreateContext(file, file.IndexOf("(Adder)") + 1);
-
-            var refactoringProvider = new InlineLambdaProvider();
-            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
-
-            Assert.AreEqual(1, context.CodeActions.Count);
-        }
-
-        [TestMethod]
-        public void CodeActionShouldReplaceMethodWithLambda()
+        public void WhenParameterIsMethod_ReplaceWithLambda()
         {
             var cts = new CancellationTokenSource();
             var file = @"
@@ -80,55 +45,21 @@ namespace ClassLibrary1
             var refactoringProvider = new InlineLambdaProvider();
             refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
 
-            var action = context.CodeActions.First();
-            var changeDocument = GetModifiedText(action).Result;
-
-            Assert.AreEqual(file
-                .Replace("StrategyReplace(Adder);", "StrategyReplace((a, b) => a + b);")
-                , changeDocument);
-        }
-
-        [TestMethod]
-        public void WhenReplacementWorks_MarkOriginalMethodForDeletion()
-        {
-            var cts = new CancellationTokenSource();
-            var file = @"
-namespace ClassLibrary1
-{
-    public class Class1
-    {
-
-        public int StrategyReplace(Func<int, int, int> action)
-        {
-            return action(1, 2);
-        }
-
-        public int Adder(int a, int b)
-        {
-            return a + b;
-        }
-
-        public void Method1()
-        {
-            var c = StrategyReplace(Adder);
-        }
-    }
-}
-";
-            var context = CreateContext(file, file.IndexOf("(Adder)") + 1);
-
-            var refactoringProvider = new InlineLambdaProvider();
-            refactoringProvider.ComputeRefactoringsAsync(context.Context).Wait();
+            Assert.AreEqual(1, context.CodeActions.Count, "CodeAction not found");
 
             var action = context.CodeActions.First();
             var changeDocument = GetModifiedDocument(action).Result;
 
+            Assert.AreEqual(file
+                .Replace("StrategyReplace(Adder);", "StrategyReplace((a, b) => a + b);")
+                , changeDocument.GetTextAsync().Result.ToString(), "Replacement not done");
+
             var syntax = changeDocument.GetSyntaxRootAsync().Result;
             var node = syntax.FindNode(new TextSpan(file.IndexOf("int Adder"), 1)).AncestorsAndSelf().OfType<MethodDeclarationSyntax>()?.First();
 
-            Assert.IsTrue(node.ContainsAnnotations);
+            Assert.IsTrue(node.ContainsAnnotations, "Original method not marked for deletion");
         }
 
-        //test parameter names, test complex expressions
+        //test parameter names, test complex expressions; add formatting annotation to lambda
     }
 }

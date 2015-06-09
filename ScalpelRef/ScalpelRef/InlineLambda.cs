@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
-namespace ScalpelRef
+namespace Scalpel
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(InlineLambdaProvider)), Shared]
     internal class InlineLambdaProvider : CodeRefactoringProvider
@@ -32,7 +32,7 @@ namespace ScalpelRef
             var semantic = await context.Document.GetSemanticModelAsync();
             var symbol = semantic.GetSymbolInfo(argument.Expression);
 
-            IMethodSymbol method = null;
+            IMethodSymbol method = symbol.Symbol as IMethodSymbol;
             if (symbol.CandidateSymbols.Count() == 1)
                 method = symbol.CandidateSymbols.First() as IMethodSymbol;
 
@@ -43,7 +43,7 @@ namespace ScalpelRef
             if (syntax == null || method.DeclaringSyntaxReferences.Count() > 1)
                 return;
 
-            var action = CodeAction.Create("Inline Lambda", c => InlineLambda(context.Document, argument, syntax));
+            var action = new AnnotatedCodeAction("Inline Lambda", c => InlineLambda(context.Document, argument, syntax));
             context.RegisterRefactoring(action);
 
         }
@@ -51,7 +51,7 @@ namespace ScalpelRef
         private async Task<Solution> InlineLambda(Document document, ArgumentSyntax argument, MethodDeclarationSyntax method)
         {
             var rewriter = new InlineLambdaRewriter();
-            return rewriter.Visit(document.Project.Solution, document, argument, method);
+            return await rewriter.Visit(document.Project.Solution, document, argument, method);
         }
 
         private class InlineLambdaRewriter : CSharpSyntaxRewriter
@@ -59,13 +59,14 @@ namespace ScalpelRef
             private ArgumentSyntax argument;
             private MethodDeclarationSyntax method;
 
-            public Solution Visit(Solution solution, Document document, ArgumentSyntax argument, MethodDeclarationSyntax method)
+            public async Task<Solution> Visit(Solution solution, Document document, ArgumentSyntax argument, MethodDeclarationSyntax method)
             {
                 this.argument = argument;
                 this.method = method;
 
-                var root = this.Visit(document.GetSyntaxRootAsync().Result);
-                return solution.WithDocumentSyntaxRoot(document.Id, root);
+                var root = await document.GetSyntaxRootAsync();
+                var newRoot = this.Visit(root);
+                return solution.WithDocumentSyntaxRoot(document.Id, newRoot);
             }
 
             public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)

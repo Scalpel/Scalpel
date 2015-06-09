@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 
-namespace ScalpelRef
+namespace Scalpel
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(ExtractParameterProvider)), Shared]
     internal class ExtractParameterProvider : CodeRefactoringProvider
@@ -34,7 +34,7 @@ namespace ScalpelRef
             if (!CanBeExtracted(literal))
                 return;
 
-            var action = CodeAction.Create("Extract Parameter", c => ExtractParameter(context.Document, literal, containingMethod, c));
+            var action = new AnnotatedCodeAction("Extract Parameter", c => ExtractParameter(context.Document, literal, containingMethod, c));
             context.RegisterRefactoring(action);
         }
 
