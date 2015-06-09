@@ -121,7 +121,7 @@
       <Project>{b520580b-91e8-46c6-ba3e-3e96ecc9922c}</Project>
       <Name>Scalpel.Annotations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ScalpelRef\ScalpelRef\Scalpel.Refactorings.csproj">
+    <ProjectReference Include="..\Scalpel.Refactorings\Scalpel.Refactorings\Scalpel.Refactorings.csproj">
       <Project>{a83cc692-77d7-4417-bb1e-af03beb864bc}</Project>
       <Name>Scalpel.Refactorings</Name>
     </ProjectReference>

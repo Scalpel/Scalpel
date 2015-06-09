@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scalpel.Refactorings", "ScalpelRef\ScalpelRef\Scalpel.Refactorings.csproj", "{A83CC692-77D7-4417-BB1E-AF03BEB864BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scalpel.Refactorings", "Scalpel.Refactorings\Scalpel.Refactorings\Scalpel.Refactorings.csproj", "{A83CC692-77D7-4417-BB1E-AF03BEB864BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScalpelRef.Vsix", "ScalpelRef\ScalpelRef.Vsix\ScalpelRef.Vsix.csproj", "{A27E8112-5E9B-4527-A9C6-588A75165EC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scalpel.Refactorings.Vsix", "Scalpel.Refactorings\Scalpel.Refactorings.Vsix\Scalpel.Refactorings.Vsix.csproj", "{A27E8112-5E9B-4527-A9C6-588A75165EC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScalpelRef.Test", "ScalpelRef.Test\ScalpelRef.Test.csproj", "{8B9E67F2-26C9-412A-A874-AA6202249456}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scalpel.Refactorings.Test", "Scalpel.Refactorings.Test\Scalpel.Refactorings.Test.csproj", "{8B9E67F2-26C9-412A-A874-AA6202249456}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scalpel.Annotations", "Scalpel.Annotations\Scalpel.Annotations.csproj", "{B520580B-91E8-46C6-BA3E-3E96ECC9922C}"
 EndProject
